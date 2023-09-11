@@ -6,7 +6,6 @@ import org.launchcode.codingevents.data.EventCategoryRepository;
 import org.launchcode.codingevents.data.EventRepository;
 import org.launchcode.codingevents.dto.EventDTO;
 import org.launchcode.codingevents.exception.ResourceNotFoundException;
-import org.launchcode.codingevents.exception.UserRegistrationException;
 import org.launchcode.codingevents.models.Event;
 import org.launchcode.codingevents.models.EventDetails;
 import org.launchcode.codingevents.models.User;

@@ -1,5 +1,7 @@
 package org.launchcode.codingevents.services;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -10,15 +12,20 @@ import org.launchcode.codingevents.exception.ResourceNotFoundException;
 import org.launchcode.codingevents.exception.UserRegistrationException;
 import org.launchcode.codingevents.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
 @Service
-public class UserService {
+@Transactional
+public class UserService implements IUserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -26,18 +33,24 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User getCurrentUser() {
-        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        HttpSession session = attr.getRequest().getSession(true);
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("Invalid username or password");
+        }
+        return new org.springframework.security.core.userdetails.User(user.getUsername(),
+                user.getPwHash(),
+                getAuthorities());
+    }
 
-        Integer userId = (Integer) session.getAttribute("user");
-        if (userId == null) {
+    public User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
             return null;
         }
 
-        Optional<User> user = findById(userId);
-
-        return user.orElse(null);
+        return findByUsername(auth.getName());
     }
 
     public User findByUsername(String username) {
@@ -72,12 +85,9 @@ public class UserService {
         return user;
     }
 
-    public boolean validateUser(User user, String password) {
-        if (user == null) {
-            return false;
-        }
 
-        return passwordEncoder.matches(password, user.getPwHash());
+    private Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     private Supplier<ResourceNotFoundException> userNotFoundException(Integer id) {

@@ -48,5 +48,4 @@ public class EventCategoryController {
         eventCategoryService.save(eventCategoryDTO);
         return "redirect:/eventCategories";
     }
-
 }
