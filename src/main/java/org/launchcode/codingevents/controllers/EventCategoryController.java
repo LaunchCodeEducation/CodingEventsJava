@@ -2,9 +2,9 @@ package org.launchcode.codingevents.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.launchcode.codingevents.data.EventCategoryRepository;
-import org.launchcode.codingevents.models.EventCategory;
+import org.launchcode.codingevents.dto.EventCategoryDTO;
 import org.launchcode.codingevents.models.User;
+import org.launchcode.codingevents.services.EventCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -22,7 +22,7 @@ import org.springframework.ui.Model;
 public class EventCategoryController {
 
     @Autowired
-    private EventCategoryRepository eventCategoryRepository;
+    private EventCategoryService eventCategoryService;
 
     @Autowired
     private AuthenticationController authController;
@@ -31,19 +31,19 @@ public class EventCategoryController {
     public String displayAllCategories(Model model, HttpSession session) {
         User currUser = authController.getUserFromSession(session);
         model.addAttribute("title", "All Categories");
-        model.addAttribute("categories", eventCategoryRepository.findAllByCreator(currUser));
+        model.addAttribute("categories", eventCategoryService.getAllCategoriesByCreator(currUser));
         return "eventCategories/index";
     }
 
     @GetMapping("create")
     public String renderCreateEventCategoryForm(Model model) {
         model.addAttribute("title", "Create Category");
-        model.addAttribute(new EventCategory());
+        model.addAttribute(new EventCategoryDTO());
         return "eventCategories/create";
     }
 
     @PostMapping("create")
-    public String processCreateEventCategoryForm(@Valid @ModelAttribute EventCategory eventCategory,
+    public String processCreateEventCategoryForm(@Valid @ModelAttribute EventCategoryDTO eventCategoryDto,
                                                  Errors errors, Model model, HttpSession session) {
 
         if (errors.hasErrors()) {
@@ -51,10 +51,7 @@ public class EventCategoryController {
             return "eventCategories/create";
         }
 
-        User currUser = authController.getUserFromSession(session);
-        eventCategory.setCreator(currUser);
-
-        eventCategoryRepository.save(eventCategory);
+        eventCategoryService.save(eventCategoryDto);
         return "redirect:/eventCategories";
     }
 
