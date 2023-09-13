@@ -1,15 +1,21 @@
 package org.launchcode.codingevents.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+import org.launchcode.codingevents.data.RoleRepository;
 import org.launchcode.codingevents.data.UserRepository;
 import org.launchcode.codingevents.dto.RegisterFormDTO;
 import org.launchcode.codingevents.exception.ResourceNotFoundException;
 import org.launchcode.codingevents.exception.UserRegistrationException;
+import org.launchcode.codingevents.models.Privilege;
+import org.launchcode.codingevents.models.Role;
+import org.launchcode.codingevents.models.RoleType;
 import org.launchcode.codingevents.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -31,6 +37,9 @@ public class UserService implements IUserService {
     private UserRepository userRepository;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -41,7 +50,7 @@ public class UserService implements IUserService {
         }
         return new org.springframework.security.core.userdetails.User(user.getUsername(),
                 user.getPwHash(),
-                getAuthorities());
+                getAuthorities(user.getRoles()));
     }
 
     public User getCurrentUser() {
@@ -67,6 +76,15 @@ public class UserService implements IUserService {
         String pwHash = passwordEncoder.encode(registration.getPassword());
         User user = new User(registration.getUsername(), pwHash);
 
+        if (registration.getEventOrganizer()) {
+            List<Role> roles = new ArrayList<>();
+            roles.add(roleRepository.findByName(RoleType.ROLE_USER.toString()));
+            roles.add(roleRepository.findByName(RoleType.ROLE_ORGANIZER.toString()));
+            user.setRoles(roles);
+        } else {
+            user.setRoles(Collections.singletonList(roleRepository.findByName(RoleType.ROLE_USER.toString())));
+        }
+
         return userRepository.save(user);
     }
 
@@ -85,9 +103,30 @@ public class UserService implements IUserService {
         return user;
     }
 
+    private Collection<? extends GrantedAuthority> getAuthorities(
+            Collection<Role> roles) {
+        return getGrantedAuthorities(getPrivilegesAndRoles(roles));
+    }
 
-    private Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    private List<String> getPrivilegesAndRoles(Collection<Role> roles) {
+        List<Privilege> collection = new ArrayList<>();
+        for (Role role : roles) {
+            collection.addAll(role.getPrivileges());
+        }
+        List<String> rolesAndPrivileges =  collection.stream()
+                .map(Privilege::getName)
+                .collect(Collectors.toList());
+        rolesAndPrivileges.addAll(roles.stream()
+            .map(Role::getName)
+            .collect(Collectors.toList())
+        );
+        return rolesAndPrivileges;
+    }
+
+    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
+        return privileges.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 
     private Supplier<ResourceNotFoundException> userNotFoundException(Integer id) {

@@ -35,6 +35,15 @@ public class User extends AbstractEntity {
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
 
+    @ManyToMany
+    @JoinTable(
+            name = "users_events",
+            joinColumns = @JoinColumn(
+                    name = "event_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "id"))
+    private Collection<Event> attendingEvents;
+
     public User() {}
 
     public User(String username, String pwHash) {
@@ -67,5 +76,13 @@ public class User extends AbstractEntity {
 
     public void setRoles(Collection<Role> roles) {
         this.roles = roles;
+    }
+
+    public Collection<Event> getAttendingEvents() {
+        return attendingEvents;
+    }
+
+    public void setAttendingEvents(Collection<Event> attendingEvents) {
+        this.attendingEvents = attendingEvents;
     }
 }

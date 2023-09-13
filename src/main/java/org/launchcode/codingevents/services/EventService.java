@@ -69,4 +69,36 @@ public class EventService {
 
         return event;
     }
+
+    public void addAttendanceForUser(Integer eventId, User user) {
+        Event event = eventRepository.findById(eventId).orElseThrow(ResourceNotFoundException::new);
+
+        if (!event.getAttendees().contains(user)) {
+            event.getAttendees().add(user);
+            eventRepository.save(event);
+        }
+    }
+
+    public void removeAttendanceForUser(Integer eventId, User user) {
+        Event event = eventRepository.findById(eventId).orElseThrow(ResourceNotFoundException::new);
+
+        event.getAttendees().remove(user);
+        eventRepository.save(event);
+    }
+
+    public void removeAttendanceForCurrentUser(Integer eventId) {
+        removeAttendanceForUser(eventId, userService.getCurrentUser());
+    }
+
+    public void addAttendanceForCurrentUser(Integer eventId) {
+        addAttendanceForUser(eventId, userService.getCurrentUser());
+    }
+
+    public boolean getUserEventAttendance(Event event) {
+        return event.getAttendees().contains(userService.getCurrentUser());
+    }
+
+    public List<Event> getAttendingEventsByCurrentUser() {
+        return (List<Event>) userService.getCurrentUser().getAttendingEvents();
+    }
 }
