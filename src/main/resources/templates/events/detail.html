@@ -18,6 +18,22 @@
         <th>Contact Email</th>
         <td th:text="${event.eventDetails.contactEmail}"></td>
     </tr>
+    <tr>
+        <th>
+            Actions
+        </th>
+        <td>
+            <form th:unless="${userAttendance}" method="post" th:action="@{/events/{id}/attending(id=${event.id})}">
+                <input type="submit" class="btn btn-info btn-sm" value="RSVP">
+            </form>
+            <form th:if="${userAttendance}" method="post" th:action="@{/events/{id}/removeAttending(id=${event.id})}">
+                <input type="submit" class="btn btn-outline-info btn-sm" value="I'm attending!">
+            </form>
+            <a sec:authorize="hasRole('ROLE_ORGANIZER')" th:href="'/events/add-tag?eventId=' + ${event.id}">
+                <button class="btn btn-secondary btn-sm">Add Tag</button>
+            </a>
+        </td>
+    </tr>
 </table>
 
 

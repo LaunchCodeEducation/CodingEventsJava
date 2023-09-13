@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.launchcode.codingevents.dto.EventCategoryDTO;
 import org.launchcode.codingevents.services.EventCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.ui.Model;
  */
 @Controller
 @RequestMapping("eventCategories")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class EventCategoryController {
 
     @Autowired
@@ -25,11 +27,12 @@ public class EventCategoryController {
     @GetMapping
     public String displayAllCategories(Model model) {
         model.addAttribute("title", "All Categories");
-        model.addAttribute("categories", eventCategoryService.getAllCategoriesByCurrentUser());
+        model.addAttribute("categories", eventCategoryService.getAllCategories());
         return "eventCategories/index";
     }
 
     @GetMapping("create")
+    @PreAuthorize("hasRole('ROLE_ORGANIZER')")
     public String renderCreateEventCategoryForm(Model model) {
         model.addAttribute("title", "Create Category");
         model.addAttribute(new EventCategoryDTO());
@@ -37,6 +40,7 @@ public class EventCategoryController {
     }
 
     @PostMapping("create")
+    @PreAuthorize("hasRole('ROLE_ORGANIZER')")
     public String processCreateEventCategoryForm(@Valid @ModelAttribute EventCategoryDTO eventCategoryDTO,
                                                  Errors errors, Model model) {
 
