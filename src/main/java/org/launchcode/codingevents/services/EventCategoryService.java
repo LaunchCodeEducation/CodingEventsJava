@@ -33,7 +33,7 @@ public class EventCategoryService {
     }
 
     public EventCategory getCategoryById(int id) {
-        return categoryRepository.findById(id).orElseThrow(UserRegistrationException::new);
+        return categoryRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     public EventCategory getCategoryByIdAndCreator(int id, User creator) {

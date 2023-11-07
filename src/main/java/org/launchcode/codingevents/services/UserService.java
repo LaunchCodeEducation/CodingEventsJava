@@ -37,11 +37,7 @@ public class UserService {
 
         Optional<User> user = findById(userId);
 
-        if (user.isEmpty()) {
-            return null;
-        }
-
-        return user.get();
+        return user.orElse(null);
     }
 
     public User findByUsername(String username) {

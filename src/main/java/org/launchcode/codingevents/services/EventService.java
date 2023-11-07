@@ -33,12 +33,20 @@ public class EventService {
         return eventRepository.findAllByCreator(creator);
     }
 
+    public List<Event> getAllEventsByCurrentUser() {
+        return eventRepository.findAllByCreator(userService.getCurrentUser());
+    }
+
     public Event getEventById(int id) {
-        return eventRepository.findById(id).orElseThrow(UserRegistrationException::new);
+        return eventRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     public Event getEventByIdAndCreator(int id, User creator) {
         return eventRepository.findByIdAndCreator(id, creator).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public void removeEventById(int id) {
+        eventRepository.deleteById(id);
     }
 
     public Event save(EventDTO eventDTO) {
@@ -56,9 +64,4 @@ public class EventService {
 
         return event;
     }
-
-    public void removeEventById(int id) {
-        eventRepository.deleteById(id);
-    }
-
 }
