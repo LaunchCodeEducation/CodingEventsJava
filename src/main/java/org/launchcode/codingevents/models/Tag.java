@@ -1,6 +1,7 @@
 package org.launchcode.codingevents.models;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -13,6 +14,9 @@ public class Tag extends AbstractEntity {
     @Size(min = 1, max = 25)
     @NotBlank
     private String name;
+
+    @ManyToOne
+    private User creator;
 
     public Tag(String name) {
         this.name = name;

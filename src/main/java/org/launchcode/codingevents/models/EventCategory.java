@@ -1,6 +1,7 @@
 package org.launchcode.codingevents.models;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Size;
 
@@ -19,6 +20,9 @@ public class EventCategory extends AbstractEntity {
     @OneToMany(mappedBy = "eventCategory")
     private final List<Event> events = new ArrayList<>();
 
+    @ManyToOne
+    private User creator;
+
     public EventCategory(@Size(min = 3, message = "Name must be at least 3 characters long") String name) {
         this.name = name;
     }
@@ -35,6 +39,14 @@ public class EventCategory extends AbstractEntity {
 
     public List<Event> getEvents() {
         return events;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
     @Override
