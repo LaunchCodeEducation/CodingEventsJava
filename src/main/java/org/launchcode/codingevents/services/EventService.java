@@ -71,7 +71,8 @@ public class EventService {
     }
 
     public void addAttendanceForUser(Integer eventId, User user) {
-        Event event = eventRepository.findById(eventId).orElseThrow(ResourceNotFoundException::new);
+        Event event = eventRepository.findById(eventId)
+            .orElseThrow(ResourceNotFoundException::new);
 
         if (!event.getAttendees().contains(user)) {
             event.getAttendees().add(user);
@@ -80,7 +81,8 @@ public class EventService {
     }
 
     public void removeAttendanceForUser(Integer eventId, User user) {
-        Event event = eventRepository.findById(eventId).orElseThrow(ResourceNotFoundException::new);
+        Event event = eventRepository.findById(eventId)
+            .orElseThrow(ResourceNotFoundException::new);
 
         event.getAttendees().remove(user);
         eventRepository.save(event);

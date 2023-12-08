@@ -82,7 +82,9 @@ public class UserService implements IUserService {
             roles.add(roleRepository.findByName(RoleType.ROLE_ORGANIZER.toString()));
             user.setRoles(roles);
         } else {
-            user.setRoles(Collections.singletonList(roleRepository.findByName(RoleType.ROLE_USER.toString())));
+            user.setRoles(Collections.singletonList(
+                roleRepository.findByName(RoleType.ROLE_USER.toString())
+            ));
         }
 
         return userRepository.save(user);
