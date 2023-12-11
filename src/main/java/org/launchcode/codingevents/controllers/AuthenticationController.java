@@ -40,14 +40,14 @@ public class AuthenticationController {
     @GetMapping("/register")
     public String displayRegistrationForm(Model model) {
         model.addAttribute(new RegisterFormDTO());
-        model.addAttribute("title", "Register");
+        model.addAttribute("title", "Register for Coding Events");
         return "register";
     }
 
     @PostMapping("/register")
     public String processRegistrationForm(@ModelAttribute @Valid RegisterFormDTO registerFormDTO,
                                           Errors errors, Model model) {
-        model.addAttribute("title", "Register");
+        model.addAttribute("title", "Register for Coding Events");
 
         if (errors.hasErrors()) {
             return "register";
@@ -73,7 +73,7 @@ public class AuthenticationController {
     @GetMapping("/login")
     public String displayLoginForm(Model model) {
         model.addAttribute(new LoginFormDTO());
-        model.addAttribute("title", "Log In");
+        model.addAttribute("title", "Log In to Coding Events");
         return "login";
     }
 
@@ -83,8 +83,7 @@ public class AuthenticationController {
                                    HttpServletRequest request,
                                    HttpServletResponse response,
                                    Model model) {
-        model.addAttribute("title", "Log In");
-
+        model.addAttribute("title", "Log In to Coding Events");
         if (errors.hasErrors()) {
             return "login";
         }
