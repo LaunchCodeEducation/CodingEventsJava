@@ -32,13 +32,7 @@ public class AuthenticationController {
             return null;
         }
 
-        Optional<User> user = userService.findById(userId);
-
-        if (user.isEmpty()) {
-            return null;
-        }
-
-        return user.get();
+        return userService.findById(userId).orElse(null);
     }
 
     private static void setUserInSession(HttpSession session, User user) {
@@ -55,9 +49,8 @@ public class AuthenticationController {
     @PostMapping("/register")
     public String processRegistrationForm(@ModelAttribute @Valid RegisterFormDTO registerFormDTO,
                                           Errors errors, Model model) {
-
+        model.addAttribute("title", "Register");
         if (errors.hasErrors()) {
-            model.addAttribute("title", "Register");
             return "register";
         }
 
@@ -65,7 +58,6 @@ public class AuthenticationController {
 
         if (existingUser != null) {
             errors.rejectValue("username", "username.alreadyexists", "A user with that username already exists");
-            model.addAttribute("title", "Register");
             return "register";
         }
 
@@ -73,7 +65,6 @@ public class AuthenticationController {
             User newUser = userService.save(registerFormDTO);
         } catch (UserRegistrationException ex) {
             errors.rejectValue("password", "passwords.mismatch", "Passwords do not match");
-            model.addAttribute("title", "Register");
             return "register";
         }
 
@@ -91,9 +82,9 @@ public class AuthenticationController {
     public String processLoginForm(@ModelAttribute @Valid LoginFormDTO loginFormDTO,
                                    Errors errors, HttpServletRequest request,
                                    Model model) {
+        model.addAttribute("title", "Log In");
 
         if (errors.hasErrors()) {
-            model.addAttribute("title", "Log In");
             return "login";
         }
 
@@ -101,7 +92,6 @@ public class AuthenticationController {
 
         if (theUser == null) {
             errors.rejectValue("username", "user.invalid", "The given username does not exist");
-            model.addAttribute("title", "Log In");
             return "login";
         }
 
@@ -109,7 +99,6 @@ public class AuthenticationController {
 
         if (!userService.validateUser(theUser, password)) {
             errors.rejectValue("password", "password.invalid", "Invalid password");
-            model.addAttribute("title", "Log In");
             return "login";
         }
 

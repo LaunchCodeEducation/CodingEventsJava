@@ -1,12 +1,10 @@
 package org.launchcode.codingevents.controllers;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.launchcode.codingevents.dto.EventDTO;
 import org.launchcode.codingevents.exception.ResourceNotFoundException;
 import org.launchcode.codingevents.models.Event;
 import org.launchcode.codingevents.models.EventCategory;
-import org.launchcode.codingevents.models.User;
 import org.launchcode.codingevents.services.EventCategoryService;
 import org.launchcode.codingevents.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,19 +26,14 @@ public class EventController {
     @Autowired
     private EventCategoryService eventCategoryService;
 
-    @Autowired
-    private AuthenticationController authController;
-
     @GetMapping
-    public String displayEvents(@RequestParam(required = false) Integer categoryId, Model model, HttpSession session) {
-        User currUser = authController.getUserFromSession(session);
-
+    public String displayEvents(@RequestParam(required = false) Integer categoryId, Model model) {
         if (categoryId == null) {
             model.addAttribute("title", "All Events");
-            model.addAttribute("events", eventService.getAllEventsByCreator(currUser));
+            model.addAttribute("events", eventService.getAllEventsByCurrentUser());
         } else {
             try {
-                EventCategory category = eventCategoryService.getCategoryByIdAndCreator(categoryId, currUser);
+                EventCategory category = eventCategoryService.getCategoryByIdForCurrentUser(categoryId);
 
                 model.addAttribute("title", "Events in category: " + category.getName());
                 model.addAttribute("events", category.getEvents());
@@ -53,33 +46,30 @@ public class EventController {
     }
 
     @GetMapping("create")
-    public String displayCreateEventForm(Model model, HttpSession session) {
-        User currUser = authController.getUserFromSession(session);
+    public String displayCreateEventForm(Model model) {
         model.addAttribute("title", "Create Event");
         model.addAttribute(new EventDTO());
-        model.addAttribute("categories", eventCategoryService.getAllCategoriesByCreator(currUser));
+        model.addAttribute("categories", eventCategoryService.getAllCategoriesByCurrentUser());
         return "events/create";
     }
 
     @PostMapping("create")
-    public String processCreateEventForm(@ModelAttribute @Valid EventDTO newEventDto,
-                                         Errors errors, Model model, HttpSession session) {
-        User currUser = authController.getUserFromSession(session);
+    public String processCreateEventForm(@ModelAttribute @Valid EventDTO newEventDTO,
+                                         Errors errors, Model model) {
         if(errors.hasErrors()) {
             model.addAttribute("title", "Create Event");
-            model.addAttribute("categories", eventCategoryService.getAllCategoriesByCreator(currUser));
+            model.addAttribute("categories", eventCategoryService.getAllCategoriesByCurrentUser());
             return "events/create";
         }
 
-        eventService.save(newEventDto);
+        eventService.save(newEventDTO);
         return "redirect:/events";
     }
 
     @GetMapping("delete")
-    public String displayDeleteEventForm(Model model, HttpSession session) {
-        User currUser = authController.getUserFromSession(session);
+    public String displayDeleteEventForm(Model model) {
         model.addAttribute("title", "Delete Events");
-        model.addAttribute("events", eventService.getAllEventsByCreator(currUser));
+        model.addAttribute("events", eventService.getAllEventsByCurrentUser());
         return "events/delete";
     }
 
@@ -96,11 +86,9 @@ public class EventController {
     }
 
     @GetMapping("detail")
-    public String displayEventDetails(@RequestParam Integer eventId, Model model, HttpSession session) {
-        User currUser = authController.getUserFromSession(session);
-
+    public String displayEventDetails(@RequestParam Integer eventId, Model model) {
         try {
-            Event event = eventService.getEventByIdAndCreator(eventId, currUser);
+            Event event = eventService.getEventByIdForCurrentUser(eventId);
 
             model.addAttribute("title", event.getName() + " Details");
             model.addAttribute("event", event);

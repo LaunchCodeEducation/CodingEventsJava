@@ -34,7 +34,7 @@ public class EventService {
     }
 
     public List<Event> getAllEventsByCurrentUser() {
-        return eventRepository.findAllByCreator(userService.getCurrentUser());
+        return getAllEventsByCreator(userService.getCurrentUser());
     }
 
     public Event getEventById(int id) {
@@ -45,6 +45,10 @@ public class EventService {
         return eventRepository.findByIdAndCreator(id, creator).orElseThrow(ResourceNotFoundException::new);
     }
 
+	public Event getEventByIdForCurrentUser(int id) {
+        return getEventByIdAndCreator(id, userService.getCurrentUser());
+	}
+
     public void removeEventById(int id) {
         eventRepository.deleteById(id);
     }
@@ -53,10 +57,12 @@ public class EventService {
         Event event = new Event();
         event.setName(eventDTO.getName());
 
-        EventDetails details = new EventDetails(eventDTO.getDescription(), eventDTO.getContactEmail());
+        EventDetails details = new EventDetails(eventDTO.getDescription(),
+                                                eventDTO.getContactEmail());
         event.setEventDetails(details);
     
-        event.setEventCategory(categoryRepository.findById(eventDTO.getCategoryId()).get());
+        event.setEventCategory(categoryRepository.findById(eventDTO.getCategoryId())
+                                                 .orElse(null));
 
         event.setCreator(userService.getCurrentUser());
 

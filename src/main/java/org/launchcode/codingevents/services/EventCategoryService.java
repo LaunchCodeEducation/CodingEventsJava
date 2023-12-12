@@ -40,6 +40,10 @@ public class EventCategoryService {
         return categoryRepository.findByIdAndCreator(id, creator).orElseThrow(ResourceNotFoundException::new);
     }
 
+    public EventCategory getCategoryByIdForCurrentUser(int id) {
+        return getCategoryByIdAndCreator(id, userService.getCurrentUser());
+    }
+
     public EventCategory save(EventCategoryDTO categoryDTO) {
         EventCategory category = new EventCategory();
         category.setName(categoryDTO.getName());

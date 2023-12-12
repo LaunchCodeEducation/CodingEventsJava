@@ -1,9 +1,7 @@
 package org.launchcode.codingevents.controllers;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.launchcode.codingevents.dto.EventCategoryDTO;
-import org.launchcode.codingevents.models.User;
 import org.launchcode.codingevents.services.EventCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,14 +22,10 @@ public class EventCategoryController {
     @Autowired
     private EventCategoryService eventCategoryService;
 
-    @Autowired
-    private AuthenticationController authController;
-
     @GetMapping
-    public String displayAllCategories(Model model, HttpSession session) {
-        User currUser = authController.getUserFromSession(session);
+    public String displayAllCategories(Model model) {
         model.addAttribute("title", "All Categories");
-        model.addAttribute("categories", eventCategoryService.getAllCategoriesByCreator(currUser));
+        model.addAttribute("categories", eventCategoryService.getAllCategoriesByCurrentUser());
         return "eventCategories/index";
     }
 
@@ -43,15 +37,15 @@ public class EventCategoryController {
     }
 
     @PostMapping("create")
-    public String processCreateEventCategoryForm(@Valid @ModelAttribute EventCategoryDTO eventCategoryDto,
-                                                 Errors errors, Model model, HttpSession session) {
+    public String processCreateEventCategoryForm(@Valid @ModelAttribute EventCategoryDTO eventCategoryDTO,
+                                                 Errors errors, Model model) {
 
         if (errors.hasErrors()) {
             model.addAttribute("title", "Create Category");
             return "eventCategories/create";
         }
 
-        eventCategoryService.save(eventCategoryDto);
+        eventCategoryService.save(eventCategoryDTO);
         return "redirect:/eventCategories";
     }
 
