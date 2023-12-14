@@ -127,7 +127,7 @@ public class EventController {
     @GetMapping("detail")
     public String displayEventDetails(@RequestParam Integer eventId, Model model) {
         try {
-            Event event = eventService.getEventByIdForCurrentUser(eventId);
+            Event event = eventService.getEventById(eventId);
 
             model.addAttribute("title", event.getName() + " Details");
             model.addAttribute("event", event);
