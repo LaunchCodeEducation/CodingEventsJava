@@ -9,7 +9,5 @@ public interface PrivilegeRepository extends CrudRepository<Privilege, Long> {
 
     Privilege findByName(String name);
 
-    @Override
-    void delete(Privilege privilege);
 }
 
