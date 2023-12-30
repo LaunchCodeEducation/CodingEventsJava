@@ -1,16 +1,11 @@
 package org.launchcode.codingevents.security;
 
-import org.launchcode.codingevents.controllers.AuthenticationController;
 import org.launchcode.codingevents.models.Privilege;
 import org.launchcode.codingevents.models.Role;
 import org.launchcode.codingevents.models.User;
 import org.launchcode.codingevents.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import jakarta.servlet.http.HttpSession;
 
 @Service
 public class SecurityService {
