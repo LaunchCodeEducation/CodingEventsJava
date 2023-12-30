@@ -4,6 +4,7 @@ import org.launchcode.codingevents.controllers.AuthenticationController;
 import org.launchcode.codingevents.models.Privilege;
 import org.launchcode.codingevents.models.Role;
 import org.launchcode.codingevents.models.User;
+import org.launchcode.codingevents.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -14,13 +15,11 @@ import jakarta.servlet.http.HttpSession;
 @Service
 public class SecurityService {
     @Autowired
-    private AuthenticationController authController;
+    private UserService userService;
 
     public boolean hasPrivilege(String privilege) {
-        final ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        final HttpSession session = attr.getRequest().getSession(false);
-        final User theUser = authController.getUserFromSession(session);
-        if (session != null && theUser != null) {
+        final User theUser = userService.getCurrentUser();
+        if (theUser != null) {
             Boolean hasPrivilege = theUser.getRoles()
                 .stream()
                 .map(Role::getPrivileges)
@@ -33,10 +32,8 @@ public class SecurityService {
     }
 
     public boolean hasRole(String role) {
-        final ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        final HttpSession session = attr.getRequest().getSession(false);
-        final User theUser = authController.getUserFromSession(session);
-        if (session != null && theUser != null) {
+        final User theUser = userService.getCurrentUser();
+        if (theUser != null) {
             Boolean hasRole = theUser.getRoles()
                 .stream()
                 .map(Role::getName)
