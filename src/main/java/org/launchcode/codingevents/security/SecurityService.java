@@ -14,27 +14,27 @@ public class SecurityService {
 
     public boolean hasPrivilege(String privilege) {
         final User theUser = userService.getCurrentUser();
-        if (theUser != null) {
-            Boolean hasPrivilege = theUser.getRoles()
-                .stream()
-                .map(Role::getPrivileges)
-                .flatMap(coll -> coll.stream())
-                .map(Privilege::getName)
-                .anyMatch(p -> p.equals(privilege));
-            return hasPrivilege;
+        if (theUser == null) {
+            return false;
         }
-        return false;
+        Boolean hasPrivilege = theUser.getRoles()
+            .stream()
+            .map(Role::getPrivileges)
+            .flatMap(coll -> coll.stream())
+            .map(Privilege::getName)
+            .anyMatch(p -> p.equals(privilege));
+        return hasPrivilege;
     }
 
     public boolean hasRole(String role) {
         final User theUser = userService.getCurrentUser();
-        if (theUser != null) {
-            Boolean hasRole = theUser.getRoles()
-                .stream()
-                .map(Role::getName)
-                .anyMatch(r -> r.equals(role));
-            return hasRole;
+        if (theUser == null) {
+            return false;
         }
-        return false;
+        Boolean hasRole = theUser.getRoles()
+            .stream()
+            .map(Role::getName)
+            .anyMatch(r -> r.equals(role));
+        return hasRole;
     }
 }
