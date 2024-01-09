@@ -5,7 +5,6 @@ import java.util.List;
 import org.launchcode.codingevents.data.EventCategoryRepository;
 import org.launchcode.codingevents.dto.EventCategoryDTO;
 import org.launchcode.codingevents.exception.ResourceNotFoundException;
-import org.launchcode.codingevents.exception.UserRegistrationException;
 import org.launchcode.codingevents.models.EventCategory;
 import org.launchcode.codingevents.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
