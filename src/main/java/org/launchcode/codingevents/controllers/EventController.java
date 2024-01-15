@@ -14,7 +14,6 @@ import java.util.List;
 @Controller
 @RequestMapping("events")
 public class EventController {
-
     @GetMapping
     public String displayAllEvents(Model model) {
         List<String> events = new ArrayList<>();
@@ -25,5 +24,13 @@ public class EventController {
         model.addAttribute("events", events);
         return "events/index";
     }
+    //route /events/create
+    @GetMapping("create")
+    public String renderCreateEventForm(){
+        return "events/create";
+    }
 
 }
+
+
+
