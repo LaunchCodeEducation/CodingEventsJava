@@ -29,6 +29,7 @@ public class EventController {
     @GetMapping("create")
     public String displayCreateEventForm(Model model) {
         model.addAttribute("title", "Create Event");
+        System.out.println("Testing branch");
         return "events/create";
     }
 
