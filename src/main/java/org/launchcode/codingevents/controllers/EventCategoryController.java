@@ -1,9 +1,10 @@
 package org.launchcode.codingevents.controllers;
 
 import jakarta.validation.Valid;
-import org.launchcode.codingevents.data.EventCategoryRepository;
-import org.launchcode.codingevents.models.EventCategory;
+import org.launchcode.codingevents.dto.EventCategoryDTO;
+import org.launchcode.codingevents.services.EventCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,37 +18,38 @@ import org.springframework.ui.Model;
  */
 @Controller
 @RequestMapping("eventCategories")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class EventCategoryController {
 
     @Autowired
-    private EventCategoryRepository eventCategoryRepository;
+    private EventCategoryService eventCategoryService;
 
     @GetMapping
     public String displayAllCategories(Model model) {
         model.addAttribute("title", "All Categories");
-        model.addAttribute("categories", eventCategoryRepository.findAll());
+        model.addAttribute("categories", eventCategoryService.getAllCategories());
         return "eventCategories/index";
     }
 
     @GetMapping("create")
+    @PreAuthorize("hasRole('ROLE_ORGANIZER')")
     public String renderCreateEventCategoryForm(Model model) {
         model.addAttribute("title", "Create Category");
-        model.addAttribute(new EventCategory());
+        model.addAttribute(new EventCategoryDTO());
         return "eventCategories/create";
     }
 
     @PostMapping("create")
-    public String processCreateEventCategoryForm(@Valid @ModelAttribute EventCategory eventCategory,
+    @PreAuthorize("hasRole('ROLE_ORGANIZER')")
+    public String processCreateEventCategoryForm(@Valid @ModelAttribute EventCategoryDTO eventCategoryDTO,
                                                  Errors errors, Model model) {
 
         if (errors.hasErrors()) {
             model.addAttribute("title", "Create Category");
-            model.addAttribute(new EventCategory());
             return "eventCategories/create";
         }
 
-        eventCategoryRepository.save(eventCategory);
+        eventCategoryService.save(eventCategoryDTO);
         return "redirect:/eventCategories";
     }
-
 }
