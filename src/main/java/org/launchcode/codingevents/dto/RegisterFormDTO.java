@@ -1,4 +1,4 @@
-package org.launchcode.codingevents.models.dto;
+package org.launchcode.codingevents.dto;
 
 public class RegisterFormDTO extends LoginFormDTO {
 

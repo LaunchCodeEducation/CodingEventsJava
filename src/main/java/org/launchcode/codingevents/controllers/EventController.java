@@ -1,17 +1,17 @@
 package org.launchcode.codingevents.controllers;
 
 import jakarta.validation.Valid;
-import org.launchcode.codingevents.data.EventCategoryRepository;
-import org.launchcode.codingevents.data.EventRepository;
+import org.launchcode.codingevents.dto.EventDTO;
+import org.launchcode.codingevents.exception.ResourceNotFoundException;
 import org.launchcode.codingevents.models.Event;
 import org.launchcode.codingevents.models.EventCategory;
+import org.launchcode.codingevents.services.EventCategoryService;
+import org.launchcode.codingevents.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-
-import java.util.Optional;
 
 /**
  * Created by Chris Bay
@@ -21,25 +21,24 @@ import java.util.Optional;
 public class EventController {
 
     @Autowired
-    private EventRepository eventRepository;
+    private EventService eventService;
 
     @Autowired
-    private EventCategoryRepository eventCategoryRepository;
+    private EventCategoryService eventCategoryService;
 
     @GetMapping
     public String displayEvents(@RequestParam(required = false) Integer categoryId, Model model) {
-
         if (categoryId == null) {
             model.addAttribute("title", "All Events");
-            model.addAttribute("events", eventRepository.findAll());
+            model.addAttribute("events", eventService.getAllEventsByCurrentUser());
         } else {
-            Optional<EventCategory> result = eventCategoryRepository.findById(categoryId);
-            if (result.isEmpty()) {
-                model.addAttribute("title", "Invalid Category ID: " + categoryId);
-            } else {
-                EventCategory category = result.get();
+            try {
+                EventCategory category = eventCategoryService.getCategoryByIdForCurrentUser(categoryId);
+
                 model.addAttribute("title", "Events in category: " + category.getName());
                 model.addAttribute("events", category.getEvents());
+            } catch(ResourceNotFoundException ex) {
+                model.addAttribute("title", "Invalid Category ID: " + categoryId);
             }
         }
 
@@ -49,27 +48,28 @@ public class EventController {
     @GetMapping("create")
     public String displayCreateEventForm(Model model) {
         model.addAttribute("title", "Create Event");
-        model.addAttribute(new Event());
-        model.addAttribute("categories", eventCategoryRepository.findAll());
+        model.addAttribute(new EventDTO());
+        model.addAttribute("categories", eventCategoryService.getAllCategoriesByCurrentUser());
         return "events/create";
     }
 
     @PostMapping("create")
-    public String processCreateEventForm(@ModelAttribute @Valid Event newEvent,
+    public String processCreateEventForm(@ModelAttribute @Valid EventDTO newEventDTO,
                                          Errors errors, Model model) {
         if(errors.hasErrors()) {
             model.addAttribute("title", "Create Event");
+            model.addAttribute("categories", eventCategoryService.getAllCategoriesByCurrentUser());
             return "events/create";
         }
 
-        eventRepository.save(newEvent);
+        eventService.save(newEventDTO);
         return "redirect:/events";
     }
 
     @GetMapping("delete")
     public String displayDeleteEventForm(Model model) {
         model.addAttribute("title", "Delete Events");
-        model.addAttribute("events", eventRepository.findAll());
+        model.addAttribute("events", eventService.getAllEventsByCurrentUser());
         return "events/delete";
     }
 
@@ -78,7 +78,7 @@ public class EventController {
 
         if (eventIds != null) {
             for (int id : eventIds) {
-                eventRepository.deleteById(id);
+                eventService.removeEventById(id);
             }
         }
 
@@ -87,15 +87,13 @@ public class EventController {
 
     @GetMapping("detail")
     public String displayEventDetails(@RequestParam Integer eventId, Model model) {
+        try {
+            Event event = eventService.getEventByIdForCurrentUser(eventId);
 
-        Optional<Event> result = eventRepository.findById(eventId);
-
-        if (result.isEmpty()) {
-            model.addAttribute("title", "Invalid Event ID: " + eventId);
-        } else {
-            Event event = result.get();
             model.addAttribute("title", event.getName() + " Details");
             model.addAttribute("event", event);
+        } catch (ResourceNotFoundException ex) {
+            model.addAttribute("title", "Invalid Event ID: " + eventId);
         }
 
         return "events/detail";

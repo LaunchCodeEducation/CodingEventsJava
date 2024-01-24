@@ -9,8 +9,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.util.Objects;
-
 /**
  * Created by Chris Bay
  */
@@ -29,6 +27,9 @@ public class Event extends AbstractEntity {
     @ManyToOne
     @NotNull(message = "Category is required")
     private EventCategory eventCategory;
+
+    @ManyToOne
+    private User creator;
 
     public Event(String name, EventCategory eventCategory) {
         this.name = name;
@@ -59,6 +60,14 @@ public class Event extends AbstractEntity {
 
     public void setEventDetails(EventDetails eventDetails) {
         this.eventDetails = eventDetails;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
     @Override

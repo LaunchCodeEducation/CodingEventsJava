@@ -10,31 +10,31 @@
 <form method="post">
     <div class="form-group">
         <label>Name
-            <input th:field="${event.name}" class="form-control">
+            <input th:field="${eventDTO.name}" class="form-control">
         </label>
-        <p class="error" th:errors="${event.name}"></p>
+        <p class="error" th:errors="${eventDTO.name}"></p>
     </div>
     <div class="form-group">
         <label>Description
-            <input th:field="${event.eventDetails.description}" class="form-control">
+            <input th:field="${eventDTO.description}" class="form-control">
         </label>
-        <p class="error" th:errors="${event.eventDetails.description}"></p>
+        <p class="error" th:errors="${eventDTO.description}"></p>
     </div>
     <div class="form-group">
         <label>Contact Email
-            <input th:field="${event.eventDetails.contactEmail}" class="form-control">
+            <input th:field="${eventDTO.contactEmail}" class="form-control">
         </label>
-        <p class="error" th:errors="${event.eventDetails.contactEmail}"></p>
+        <p class="error" th:errors="${eventDTO.contactEmail}"></p>
     </div>
     <div class="form-group">
         <label>Category
-            <select th:field="${event.eventCategory}">
+            <select th:field="${eventDTO.categoryId}">
                 <option th:each="eventCategory : ${categories}"
                         th:value="${eventCategory.id}"
                         th:text="${eventCategory.name}"
                 ></option>
             </select>
-            <p class="error" th:errors="${event.eventCategory}"></p>
+            <p class="error" th:errors="${eventDTO.categoryId}"></p>
         </label>
     </div>
     <div class="form-group">
