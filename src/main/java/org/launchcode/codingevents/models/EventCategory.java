@@ -11,7 +11,7 @@ import java.util.Objects;
  * Created by Chris Bay
  */
 @Entity
-public class EventCategory {
+public class EventCategory extends AbstractEntity{
 
     @Id
     @GeneratedValue
